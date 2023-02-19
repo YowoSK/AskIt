@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="sk">
+  <%- include ('./partials/header.ejs') -%>
+
+  <body>
+    <table class="table_users">
+      <div class="all users">
+        <tr>
+          <th>EMAIL</th>
+          <th>ROLA</th>
+          <th>VYTVORENÝ</th>
+          <th>ID</th>
+          <th>ZMAZAŤ</th>
+        </tr>
+        <% if (users.length>0) { %> <% users.forEach(user=>{ %>
+
+        <tr>
+          <td class="email"><%= user.email %></td>
+          <td class="role"><%= user.role %></td>
+          <td class="createdAt">
+            <%= new Date(user.createdAt).toLocaleString('en-US', {day:
+            'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute:
+            'numeric', second: 'numeric'}) %>
+          </td>
+          <td class="_id"><%= user._id %></td>
+          <td class="deleteElement">
+            <a class="delete" data-doc="<%= user._id %>">X</a>
+          </td>
+        </tr>
+
+        <% }) %> <% } else{ %>
+        <p>There are no blogs to display</p>
+        <% } %>
+      </div>
+    </table>
+    <script>
+      const trashcan = document.querySelectorAll("a.delete");
+      for (var i = 0; i < trashcan.length; i++) {
+        trashcan[i].onclick = function (e) {
+          const tgt = e.target;
+          console.log("Stlačil si delete ");
+          const endpoint = `/users/${tgt.dataset.doc}`;
+          fetch(endpoint, { method: "DELETE" })
+            .then((response) => response.json())
+            .then((data) => (window.location.href = data.redirect))
+            .catch((err) => console.log(err));
+        };
+      }
+    </script>
+  </body>
+</html>

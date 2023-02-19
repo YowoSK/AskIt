@@ -1,0 +1,193 @@
+body {
+  -webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: antialiased;
+	font-smooth: antialiased;
+  background: rgb(121,167,211);
+  background: radial-gradient(circle, rgb(167, 188, 207) 0%, rgba(104,131,188,1) 100%);
+}
+/* login styles */
+/* style tlacitka je pouzity z class .btn .btn_features */
+.form_text {
+  color: #454545;
+  padding: 0;
+  padding-left: 0;
+}
+.form_header {
+  padding: 0;
+}
+/*
+.form_wrapper {
+  border: 4px solid rgb(11, 117, 31);
+  width: 30%;
+  margin: auto;
+  margin-top: 10%;
+}
+*/
+/* end of login styles */
+/* input styles */
+
+.input_text[type=text]{
+  width: 35%;
+  border: 2px solid #8A307F;
+  outline: none;
+  padding: 6px;
+  margin-top: 6px;
+  margin-bottom: 6px;
+  box-sizing: border-box;
+  transition: 0.4s;
+  text-align: left;
+}
+.input_text[type=text]:focus{
+  border-color:#8A307F;
+  box-shadow:0 0 8px 0 #8A307F;
+}
+.input_text[type=password]{
+  width: 35%;
+  border: 2px solid #8A307F;
+  outline: none;
+  padding: 6px;
+  margin-top: 6px;
+  margin-bottom: 6px;
+  box-sizing: border-box;
+  transition: 0.4s;
+  text-align: left;
+}
+.input_text[type=password]:focus{
+  border-color:#8A307F;
+  box-shadow:0 0 8px 0 #8A307F;
+}
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 90deg;
+  inherits: true;
+}
+:root {
+	--x: 2500ms;
+	--angle: 90deg;
+	--c1: #375e8b;
+	--c2: #6883BC;
+}
+.form_wrapper {
+	border: 0.45rem solid;
+	border-image: conic-gradient(from var(--angle), var(--c2), var(--c1) 0.1turn, var(--c1) 0.15turn, var(--c2) 0.25turn) 30;
+	animation: borderRotate var(--x) linear infinite forwards;
+  width: 30%;
+  margin: auto;
+  margin-top: 10%;
+}
+@keyframes borderRotate {
+	100% {
+		--angle: 420deg;
+	}
+}
+/* end of input styles */
+/* paragraph for linking between signup and login if user have or dont have account */
+.form_p {
+  color: #454545;
+  padding: 0;
+  width: 100%;
+  margin: 0;
+  font-size: small;
+  margin-top: 10px;
+}
+/* end of paragraph */
+/* error style */
+.error {
+  color: #b30c00;
+  margin: 0;
+  font-size: small;
+}
+/* end of error style */
+.input_text[type=text]{
+  width: 35%;
+  border: 2px solid #8A307F;
+  outline: none;
+  padding: 6px;
+  margin-top: 6px;
+  margin-bottom: 6px;
+  box-sizing: border-box;
+  transition: 0.4s;
+  text-align: left;
+}
+.input_text[type=text]:focus{
+  border-color:#8A307F;
+  box-shadow:0 0 8px 0 #8A307F;
+}
+.box_pswd[type=checkbox]:focus{
+  border-color:#8A307F;
+  box-shadow:0 0 8px 0 #8A307F;
+}
+.input_text[type=password]{
+  width: 35%;
+  border: 2px solid #8A307F;
+  outline: none;
+  padding: 6px;
+  margin-top: 6px;
+  margin-bottom: 6px;
+  box-sizing: border-box;
+  transition: 0.4s;
+  text-align: left;
+}
+.box_pswd[type=checkbox]{
+  border: 2px solid #8A307F;
+  border-radius: 50%;
+  box-sizing: border-box;
+  transition: 0.4s;
+  position: relative;
+  left: -6px;
+  top: 2px;
+  color: #8A307F;
+  margin-left: -19px;
+  cursor: pointer;
+  content: "";
+}
+.input_text[type=password]:focus{
+  border-color:#8A307F;
+  box-shadow:0 0 8px 0 #8A307F;
+}
+.box_pswd:checked {
+  content: "x";
+}
+
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 90deg;
+  inherits: true;
+}
+:root {
+	--x: 2500ms;
+	--angle: 90deg;
+	--c1: #375e8b;
+	--c2: #6883BC;
+}
+.form_wrapper {
+	border: 0.45rem solid;
+	border-image: conic-gradient(from var(--angle), var(--c2), var(--c1) 0.1turn, var(--c1) 0.15turn, var(--c2) 0.25turn) 30;
+	animation: borderRotate var(--x) linear infinite forwards;
+  width: 30%;
+  margin: auto;
+  margin-top: 10%;
+}
+@keyframes borderRotate {
+	100% {
+		--angle: 420deg;
+	}
+}
+/* end of input styles */
+/* paragraph for linking between signup and login if user have or dont have account */
+.form_p {
+  color: #454545;
+  padding: 0;
+  width: 100%;
+  margin: 0;
+  font-size: small;
+  margin-top: 10px;
+}
+/* end of paragraph */
+/* error style */
+.error {
+  color: #b30c00;
+  margin: 0;
+  font-size: small;
+}
+/* end of error style */

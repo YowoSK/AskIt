@@ -1,0 +1,24 @@
+<!-- <nav>
+    <ul>
+        <li><a class="login_link" href="/login">Prihlásenie</a></li>
+        <li><a href="/"><img class="header_logo" src="/BlackLogo.png" alt="logo"></li></a>
+    </ul>
+</nav> -->
+<nav id='menu'>
+  <input type='checkbox' id='responsive-menu' onclick='updatemenu()'><label></label>
+  <ul>
+    <li><a id="page_logo" href='/questions'><img class="logo_navbar" src="/img/nav_logo_finnal.png" alt="Navbar_logo"></a></li>
+    <li><a class="sub-menus-padding" href="/logout">Odhlásiť sa</a></li>
+  </ul>
+</nav>
+<script>
+  function updatemenu() {
+  if (document.getElementById('responsive-menu').checked == true) {
+    document.getElementById('menu').style.borderBottomRightRadius = '0';
+    document.getElementById('menu').style.borderBottomLeftRadius = '0';
+  }else{
+    document.getElementById('menu').style.borderRadius = '0px';
+  }
+}
+
+</script>

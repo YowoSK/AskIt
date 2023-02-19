@@ -1,0 +1,21 @@
+.error_wrapper{
+  border: 0.45rem solid;
+  border-image: conic-gradient(from var(--angle), var(--c2), var(--c1) 0.1turn, var(--c1) 0.15turn, var(--c2) 0.25turn) 30;
+  animation: borderRotate var(--x) linear infinite forwards;
+  width: 30%;
+  margin: auto;
+  margin-top: 10%;
+  text-align: center;
+  letter-spacing: 1px;
+}
+.error_reason {
+  text-transform: uppercase;
+}
+.error_text {
+  color: #454545;
+  padding: 0;
+  width: 100%;
+  margin: 0;
+  font-size: 100%;
+  margin-top: 10px;
+}

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="sk">
+
+<head>
+  <%- include ('./partials/header.ejs') %>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Štatistika</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+      integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
+</head>
+
+<body>
+  <%- include ('./partials/teacher_nav.ejs') -%>
+    <h1 class="site_text">Štatistika ohodnotených odpovedí</h1>
+    <h3 class="site_text">Feedback nás posúva vpred 😊</h3>
+    <select class="input_text" id="sort-criteria" onchange="sortTable()">
+      <option value="createdAt">Dátum</option>
+      <option value="rating.starsAverage">Priemerné hodnotenie</option>
+      <option value="rating.numberOfRatings">Počet hodnotení</option>
+    </select>
+    <br />
+    <div class="tableScroll"></div>
+    <table id="dataTable" class="table">
+      <thead>
+        <tr>
+          <th scope="col">Otázka</th>
+          <th scope="col">Dátum</th>
+          <th scope="col">Hodnotenie</th>
+          <th scope="col">Počet hodnotení</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <% worstQuestionsList.forEach(question=> { %>
+          <% if (question.rating.starsAverage <=2.5) { %>
+            <%let roundedStarsAverage=Math.round(question.rating.starsAverage *100) / 100; %>
+              <%let date=new Date(question.createdAt); %>
+                <tr>
+                  <th>
+                    <%= question.input %>
+                  </th>
+                  <td>
+                    <%= date.toLocaleDateString("en-US", {weekday: "short" , month: "short" , day: "numeric" ,
+                      hour: "numeric" , minute: "numeric" }) %>
+                  </td>
+                  <td>
+                    <%= roundedStarsAverage %>
+                  </td>
+                  <td>
+                    <%= question.rating.numberOfRatings %>
+                  </td>
+                </tr>
+                <% }}) %>
+      </tbody>
+      </div>
+    </table>
+
+    <!-- Lucia Graf -->
+    <iframe
+      style="background: transparent;width: 50%;height: 100vh; margin: auto;"
+      src="https://charts.mongodb.com/charts-ask-me-project-pytgp/embed/dashboards?id=63d02488-a3c8-4e21-8ab2-c297e84ab1d6&theme=light&autoRefresh=true&maxDataAge=10&showTitleAndDesc=false&scalingWidth=fixed&scalingHeight=fixed"></iframe>
+
+    <script>
+      let sortCriteria = document.getElementById("sort-criteria");
+      const url = window.location.href
+      sortCriteria.value = url.substr(url.indexOf("sort=") + 5) //take name from url and substring it from "sort" +5 symbols      
+      function sortTable() {
+        window.location = `/statistics/sort=${sortCriteria.value}`
+      }
+    </script>
+
+    <%- include('./partials/footer.ejs') %>
+</body>
+
+</html>

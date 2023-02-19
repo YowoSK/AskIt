@@ -1,0 +1,80 @@
+<%- include ('./partials/header.ejs') %>
+
+    <form class="form_wrapper">
+        <h2 class="site_text">Registrácia študenta:</h2>
+        <label class="form_text" for="email">Email:</label>
+        <input class="input_text" type="text" name="email" required>
+        <div class="email error"></div>
+
+        <label class="form_text" for="password">Heslo:</label>
+        <input class=" input_text" type="password" name="password" required id="myPassword">
+        <input class="box_pswd" type="checkbox" onclick="showPassword('myPassword')">
+        <div class="password error"></div>
+        <label class="form_text" for="password">Heslo znova:</label>
+        <input class=" input_text" type="password" name="confirmPassword" required id="myConfirmedPassword">
+        <input class="box_pswd" type="checkbox" onclick="showPassword('myConfirmedPassword')">
+        <div class="confirmPassword error"></div>
+
+        <!-- <p class="form_p">Už máš učet? <a href="/login"><u>klikni tu</u></a></p> -->
+        <button class="btn btn-features" onClick="refreshPage()"><span>Registrovať</span></button>
+    </form>
+    <script>
+        const form = document.querySelector('form');
+        const emailError = document.querySelector('.email.error');
+        const passwordError = document.querySelector('.password.error');
+        const confirmError = document.querySelector('.confirmPassword.error');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            //reset form
+            emailError.textContent = '';
+            passwordError.textContent = '';
+            confirmError.textContent = '';
+
+            //get the values
+            const email = form.email.value;
+            const password = form.password.value;
+            const confirmPassword = form.confirmPassword.value;
+
+            try {
+                const res = await fetch('/signup', {
+                    method: 'POST',
+                    body: JSON.stringify({ email, password, confirmPassword }),
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                const data = await res.json();
+                if (data.errors) {
+                    emailError.textContent = data.errors.email;
+                    passwordError.textContent = data.errors.password;
+                    confirmError.textContent = data.errors.confirmPassword;
+                }
+                // if (data.user) {
+                //     // location.assign('/users')
+                //     alert("User created successfully!");
+                // }
+                // else {
+                //     alert("User created successfully!");
+                //     // checkUser();
+                // }
+            }
+            catch (err) {
+                console.log(err)
+            }
+        });
+        // show password
+        function showPassword(id) {
+            var x = document.getElementById(id);
+            if (x.type === "password") {
+                x.type = "text";
+            } else {
+                x.type = "password";
+            }
+        }
+        //refresh form after submitting
+        function refreshPage() {
+            window.location.reload();
+        } 
+    </script>
+
+    <%- include ('./partials/footer.ejs') %>

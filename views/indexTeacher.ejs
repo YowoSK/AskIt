@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="sk">
+
+<%- include ('./partials/header.ejs') -%>
+
+    <body>
+        <%- include ('./partials/teacher_nav.ejs') -%>
+            <br>
+
+            <div class="create-questions content">
+                <h1 class="site_text">Získaj prehľad o priebehu hodiny.<br>Použi časovač!</h1>
+                <button class="btn btn-features" id="hideButton"><span>Zmazať všetky otázky</span></button>
+                <div class="timer">
+                    <div class="watch">
+                        00:00:00
+                    </div>
+                    <div class="controls">
+                        <button class="btn btn-features" id="btnStart"><span>▶</span></button>
+                        <button class="btn btn-features" id="btnStop"><span>II</span></button>
+                        <button class="btn btn-features" id="btnReset"><span>■</span></button>
+                    </div>
+                </div>
+
+                <hr class="hr_main">
+                <div class="blogs_content">
+                    <% if (questions.length> 0) { %>
+                        <% questions.forEach(question=> { %>
+
+                            <div class="question" id="<%= question._id%>">
+                                <p class="input">
+                                    <%= question.input %>
+                                        <%= question.stars %>
+                                </p>
+
+
+                                <a class="animated delete" data-doc="<%= question._id %>">Zmazať otázku</a>
+
+
+                                <!-- Michal liky/disliky -->
+                                <div class="likecontainer" id="likecontainer">
+                                    <button id="likebtn"
+                                        class="<%= question.NumberOfLikes.Likes >= 32 ? 'disable' : '' %>">
+                                        <i style="font-size: 25px;" class="fa fa-thumbs-up"></i>
+                                        <!--<span id="numberoflikes"></span>-->
+                                    </button>
+                                    <!--<input type="number" id="countlike" value="0" > -->
+                                    <p class="displayLikes" id="displayLikes">
+                                        <%= question.NumberOfLikes.Likes %>
+                                            <!-- <%= question.Likes %> -->
+                                    </p>
+                                    <button id="dislikebtn"
+                                        class="<%= question.NumberOfDislikes.Dislikes >= 32 ? 'disable' : '' %>">
+                                        <i style="font-size: 25px;" class="fa fa-thumbs-down"></i>
+                                    </button>
+                                    <!--<input type="number" id="countdislike" value="0">-->
+                                    <p class="displayDislikes" id="displayDislikes">
+                                        <%= question.NumberOfDislikes.Dislikes %>
+                                            <!-- <%= question.Dislikes %> -->
+                                    </p>
+                                </div>
+                                <br>
+                                <hr class="hr_main">
+                            </div>
+                            <% }) %>
+                                <% } else { %>
+                                    <p>Naozaj všetkému rozumieš?</p>
+                                    <% } %>
+                </div>
+            </div>
+            <%- include ('./partials/footer.ejs') %>
+                <script>
+
+                    //Marek:namiesto vymazania otazky sa skryje
+                    const trashcan = document.querySelectorAll('a.delete');
+                    const questions = document.querySelectorAll(".question");
+                    for (var i = 0; i < trashcan.length; i++) {
+                        trashcan[i].onclick = function (e) {
+                            const tgt = e.target;
+                            const question = tgt.parentNode.id;
+                            localStorage.setItem("question" + tgt.dataset.doc, "hidden");
+                            const questionElement = document.getElementById(question);
+                            questionElement.style.display = 'none';
+                            
+                        }
+                    };
+
+
+                    //automaticky reload kazdych 20sek
+                    function autoRefresh() {
+                        window.location = window.location.href;
+                    }
+                    setInterval('autoRefresh()', 20000);
+
+
+                    //Mare: save scroll position 
+                    window.addEventListener('beforeunload', function () {
+                        localStorage.setItem('scrollPos', window.pageYOffset);
+                    });
+
+
+                    //Marek:Skryje otazky po kliknuti tlacidla a ulozi do lokal storage stav 
+
+                    const hideButton = document.getElementById("hideButton");
+                    hideButton.addEventListener("click", function () {
+                        const questions = document.querySelectorAll(".question");
+                        for (let i = 0; i < questions.length; i++) {
+                            const question = questions[i];
+                            localStorage.setItem("question" + question.id, "hidden");
+                            question.style.display = "none";
+                        }
+                    });
+
+                    //Marek:Po reloadnuti stranky sa nastavi scroll a viditelnost otazok
+                    window.addEventListener("load", function () {
+                        var scrollPos = localStorage.getItem('scrollPos');
+                        window.scroll(0, scrollPos);
+
+                        const questions = document.querySelectorAll(".question");
+                        for (let i = 0; i < questions.length; i++) {
+                            const question = questions[i];
+                            const isHidden = localStorage.getItem("question" + question.id);
+                            if (isHidden) {
+                                // question.classList.add("hidden");
+                                question.style.display = "none";
+                            }
+                        }
+
+                    });
+
+
+
+
+
+                    //Marek mazanie otazok
+                    // const trashcan = document.querySelectorAll('a.delete');
+                    // for (var i = 0; i < trashcan.length; i++) {
+                    //     trashcan[i].onclick = function (e) {
+                    //         const tgt = e.target;
+                    //         console.log('Stlacil si delete')
+                    //         const endpoint = `/questions/${tgt.dataset.doc}`;
+                    //         fetch(endpoint, {
+                    //             method: 'DELETE',
+                    //         })
+                    //             .then(response => response.json())
+                    //             .then(data => window.location.href = data.redirect)
+                    //             .catch(err => console.log(err));
+                    //     }
+                    // };
+
+
+
+
+
+                    //Robo casovac//
+                    const time_el = document.querySelector('.timer .watch ')
+                    const start_btn = document.getElementById('btnStart');
+                    const stop_btn = document.getElementById('btnStop');
+                    const reset_btn = document.getElementById('btnReset');
+                    let seconds = 0;
+                    let interval = null;
+
+                    start_btn.addEventListener('click', btnStart)
+                    stop_btn.addEventListener('click', btnStop)
+                    reset_btn.addEventListener('click', btnReset)
+
+                    function watch() {
+                        seconds++;
+
+                        let hrs = Math.floor(seconds / 3600);
+                        let mins = Math.floor((seconds - (hrs * 3600)) / 60);
+                        let secs = seconds % 60;
+
+                        if (secs < 10) secs = '0' + secs
+                        if (mins < 10) mins = '0' + mins
+                        if (hrs < 10) hrs = '0' + hrs
+
+                        time_el.innerText = `${hrs}:${mins}:${secs}`;
+                    }
+
+                    function btnStart() {
+                        if (interval) {
+                            return
+                        }
+                        interval = setInterval(watch, 1000)
+                    }
+                    function btnStop() {
+                        clearInterval(interval);
+                        interval = null;
+                    }
+                    function btnReset() {
+                        stop();
+                        seconds = 0;
+                        time_el.innerText = '00:00:00'
+                    }
+
+                </script>
+    </body>
+
+</html>

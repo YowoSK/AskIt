@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="sk">
+
+<%- include ('./partials/header.ejs') -%>
+
+    <body>
+        <%- include ('./partials/nav.ejs') -%>
+            <br>
+
+            <div class="create-questions content">
+                <h1 class="site_text">Nehanbi sa, pýtaj sa!</h1>
+                <h2 class="site_text">Kto sa veľa pýta, veľa sa dozvie. <i class="fa fa-thumbs-up"></i>
+                </h2>
+                <form action="/questions" method="POST" id="form" onsubmit="return validateForm(event)">
+                    <br>
+                    <label class="site_text" for="input" id="labelText">Sem napíš svoju
+                        otázku:</label>
+                    <input class="input_text" type="text" id="input" name="input" required size="100">
+                    <br>
+                    <button class="btn btn-features" type="submit"><span>Odoslať
+                            otázku</span></button>
+                </form>
+                <hr class="hr_main">
+                <div class="blogs_content">
+                    <% if (questions.length> 0) { %>
+                        <% questions.forEach(question=> { %>
+                            <p class="input">
+                                <%= question.input %>
+                                    <%= question.stars %>
+                            </p>
+                            
+
+                            <!-- Svetlanine hviezdicky -->
+                            <!-- triggered button -->
+                            
+                            <button class="btn btn-features" id="doneButton"
+                                onclick="clickModal('<%= question._id %>')"><span>Ohodnoť
+                                    odpoveď</span></button>
+                            <!-- the modal window -->
+                            <div id="doneModal-<%= question._id %>" class="modal">
+                                <!-- modal content -->
+                                <div class="modal-content">
+                                    <span class="close">&times;</span>
+                                        
+                                    <p class="doYouLike">Ako sa ti páčilo vysvetlenie
+                                    <p>
+                                        <div id="errorDiv-<%= question._id %>" style="color:brown"></div>
+                                    <div class="rating" data-total-value="0">
+                                        <div class="rating_item" data-item-value="5"
+                                            onclick="rate('<%= question._id %>', 5)">★</div>
+                                        <div class="rating_item" data-item-value="4"
+                                            onclick="rate('<%= question._id %>', 4)">★</div>
+                                        <div class="rating_item" data-item-value="3"
+                                            onclick="rate('<%= question._id %>', 3)">★</div>
+                                        <div class="rating_item" data-item-value="2"
+                                            onclick="rate('<%= question._id %>', 2)">★</div>
+                                        <div class="rating_item" data-item-value="1"
+                                            onclick="rate('<%= question._id %>', 1)">★</div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="rating disable" data-total-value="0">
+                                <div class="rating_item <%= question.rating.starsAverage >= 4.5 ? 'active' : '' %>"
+                                    data-item-value="5">★</div>
+                                <div class="rating_item <%= question.rating.starsAverage >= 3.5 ? 'active' : '' %>"
+                                    data-item-value="4">★</div>
+                                <div class="rating_item <%= question.rating.starsAverage >= 2.5 ? 'active' : '' %>"
+                                    data-item-value="3">★</div>
+                                <div class="rating_item <%= question.rating.starsAverage >= 1.5 ? 'active' : '' %>"
+                                    data-item-value="2">★</div>
+                                <div class="rating_item <%= question.rating.starsAverage >= 0 ? 'active' : '' %>"
+                                    data-item-value="1">★</div>
+                            </div>
+
+
+                            <!-- Michal liky/disliky -->
+                            <div class="likecontainer" id="likecontainer">
+                                <button id="likebtn" onclick="like('<%= question._id %>')"
+                                    class="<%= question.NumberOfLikes.Likes >= 32 ? 'disable' : '' %>">
+                                    <i style="font-size: 25px;" class="fa fa-thumbs-up"></i>
+                                    <!--<span id="numberoflikes"></span>-->
+                                </button>
+                                <!--<input type="number" id="countlike" value="0" > -->
+                                <p class="displayLikes" id="displayLikes">
+                                    <%= question.NumberOfLikes.Likes %>
+                                        <!-- <%= question.Likes %> -->
+                                </p>
+                                <button id="dislikebtn" onclick="dislike('<%= question._id %>')"
+                                    class="<%= question.NumberOfDislikes.Dislikes >= 32 ? 'disable' : '' %>">
+                                    <i style="font-size: 25px;" class="fa fa-thumbs-down"></i>
+                                </button>
+                                <!--<input type="number" id="countdislike" value="0">-->
+                                <p class="displayDislikes" id="displayDislikes">
+                                    <%= question.NumberOfDislikes.Dislikes %>
+                                        <!-- <%= question.Dislikes %> -->
+                                </p>
+                            </div>
+                            <br>
+                            <hr class="hr_main">
+                            <% }) %>
+                                <% } else { %>
+                                    <p class="p_first_question">Naozaj všetkému rozumieš?</p>
+                                    <% } %>
+                </div>
+
+                </form>
+            </div>
+
+            <%- include ('./partials/footer.ejs') %>
+
+                <script>
+                    var messages = document.getElementById('messages');
+                    var form = document.getElementById('form');
+                    var input = document.getElementById('input');
+
+                    //automaticky reload kazdych 20sek
+                    function autoRefresh() {
+                        window.location = window.location.href;
+                    }
+                    setInterval('autoRefresh()', 20000);
+
+                    //ulozi text do local storage ktory je v text inpute
+                    const inputField = document.querySelector('#input');
+
+                    // Check if there is any saved text in local storage
+                    if (localStorage.getItem('inputText')) {
+                        inputField.value = localStorage.getItem('inputText');
+                    }
+
+                    // Save the text to local storage whenever it changes
+                    inputField.addEventListener('input', function () {
+                        localStorage.setItem('inputText', inputField.value);
+                    });
+
+
+                    // Store the scroll position before reloading  Maresk test 
+                    window.addEventListener('beforeunload', function () {
+                        localStorage.setItem('scrollPos', window.pageYOffset);
+                    });
+
+                    // Retrieve the scroll position after reloading and set the scroll position Marek test
+                    window.addEventListener('load', function () {
+                        var scrollPos = localStorage.getItem('scrollPos');
+                        window.scroll(0, scrollPos);
+                    });
+
+                    //Marek mazanie otazok
+                    const trashcan = document.querySelectorAll('a.delete');
+                    for (var i = 0; i < trashcan.length; i++) {
+                        trashcan[i].onclick = function (e) {
+                            const tgt = e.target;
+                            console.log('Stlačil si delete')
+                            const endpoint = `/questions/${tgt.dataset.doc}`;
+                            fetch(endpoint, {
+                                method: 'DELETE',
+                            })
+                                .then(response => response.json())
+                                .then(data => window.location.href = data.redirect)
+                                .catch(err => console.log(err));
+                        }
+                    };
+                    
+
+                    document.getElementById('input').style.height = "50px";
+                    document.getElementById('input').style.width = "500px";
+                    document.getElementById('input').style.fontSize = "15pt";
+
+                    document.getElementById('preventme').addEventListener(
+                        'click', function (e) { e.preventDefault(); }, false
+                    );
+
+                    //Svetlanine hviezdicky
+                    function rate(id, rating) {
+
+                        const endpoint = `/questions/${id}/rate/${rating}`;
+                        
+                    const modalState = localStorage.getItem(`doneState-${id}`);
+                        if (modalState === "clicked") {                            
+                        // alert("Error: už si hlasoval");  
+                        showError(id);                                                   
+                         }else{
+
+                        fetch(endpoint, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                        })
+                            .then(response => response.json())
+                            .then(data => window.location.href = data.redirect)
+                            .catch(err => console.log(err));
+                            
+                            localStorage.setItem(`doneState-${id}`, "clicked");
+                    } }      
+                    
+                    function showError(id){
+                        const errorDiv = document.getElementById(`errorDiv-${id}`).innerHTML = "Error: už si hlasoval!";
+                    }
+                    
+                    function clickModal(questionId) {                       
+                        const modal = document.getElementById(`doneModal-${questionId}`);
+                            modal.style.display = "block";
+                            
+
+                            modal.querySelector('.close').onclick = function () {
+                                modal.style.display = "none";
+                            }
+
+                            window.onclick = function (event) {
+                                if (event.target == modal) {
+                                    modal.style.display = "none";
+                                }
+                            }                                       
+                    }                    
+
+                    //Michalove like-y
+                    function like(id, NumberOfLikes) {
+                        const endpoint = `questions/${id}/like/${NumberOfLikes}`;                        
+
+                        fetch(endpoint, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                        })
+                            .then(response => response.json())
+                            .then(data => window.location.href = data.redirect)
+                            .catch(err => console.log(err));
+                      }
+
+
+                    function dislike(id, NumberOfDislikes) {
+                        const endpoint = `questions/${id}/dislike/${NumberOfDislikes}`;
+                        fetch(endpoint, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                        })
+                            .then(response => response.json())
+                            .then(data => window.location.href = data.redirect)
+                            .catch(err => console.log(err));
+                    }
+
+                    //Michal javascript
+                    const likebtn = document.querySelector('#likebtn');
+                    let dislikebtn = document.querySelector('#dislikebtn');
+                    let countlike = document.querySelector('#countlike');
+                    let countdislike = document.querySelector('#countdislike');
+
+                    likebtn.addEventListener('click', (id) => {                        
+                        countlike.value = parseInt(countlike.value) + 1;
+                        countlike.style.color = "#12ff00";
+                         localStorage.setItem(`liked-${id}`, "like");
+                    });
+
+                    dislikebtn.addEventListener('click', () => {
+                        countdislike.value = parseInt(countdislike.value) + 1;
+                        countdislike.style.color = "#ff0000";
+                    })
+
+
+                    // Marek cenzura
+                    async function validateForm(event) {
+                        event.preventDefault();
+                        var txtInput = document.getElementById("input").value;
+                        try {
+                            const response = await fetch("questions/slurs.txt");
+                            const data = await response.text();
+                            const restrictedWords = data.split("\r\n");
+                            console.log(restrictedWords);
+
+                            var error = 0;
+                            for (var i = 0; i < restrictedWords.length; i++) {
+                                var val = restrictedWords[i];
+                                if ((txtInput.toLowerCase()).indexOf(val.toString()) > -1) {
+                                    error = error + 1;
+                                }
+                            }
+
+                            if (error > 0) {
+                                console.log("bad word");
+                                console.log("Returned false");
+                                alert("You have entered some restricted words.");
+                                return false;
+                            } else {
+                                console.log("Returned true");
+                                document.getElementById("form").submit();
+                                localStorage.setItem('inputText', "");
+                                return true;
+                            }
+                        } catch (error) {
+                            console.log(error);
+                        }
+                    }
+                </script>
+    </body>
+
+</html>

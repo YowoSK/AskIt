@@ -1,0 +1,68 @@
+<%- include ('./partials/header.ejs') -%>
+
+    <form class="form_wrapper">
+        <h2 class="form_header">Prihlásenie</h2>
+        <label class="form_text" for="email">Email:</label>
+        <input class="input_text" type="text" name="email" required>
+        <div class="email error"></div>
+
+        <label class="form_text" for="password">Heslo:</label>
+        <input class="input_text" type="password" name="password" required id="myInput">
+        <input class="box_pswd" type="checkbox" onclick="showPassword()">
+        <div class="password error"></div>
+        <button class="btn btn-features"><span>Prihlásiť sa</span></button>
+    </form>
+
+    <script>
+        const form = document.querySelector('form');
+        const emailError = document.querySelector('.email.error');
+        const passwordError = document.querySelector('.password.error');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            //reset form
+            emailError.textContent = '';
+            passwordError.textContent = '';
+
+            //get the values
+            const email = form.email.value;
+            const password = form.password.value;
+
+            try {
+                const res = await fetch('/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ email, password }),
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                const data = await res.json();
+
+                if (data.errors) {
+                    emailError.textContent = data.errors.email;
+                    passwordError.textContent = data.errors.password;
+                }
+
+                if (data.user) {
+                    if (form.email.value == 'teacher@appka.sk') {
+                        location.assign('/teacher')
+                    } else {
+                        location.assign('/questions')
+                    }
+                }
+            }
+            catch (err) {
+                console.log(err)
+            }
+        });
+        // show password
+        function showPassword() {
+            var x = document.getElementById("myInput");
+            if (x.type === "password") {
+                x.type = "text";
+            } else {
+                x.type = "password";
+            }
+        }
+    </script>
+
+    <%- include ('./partials/footer.ejs') %>
