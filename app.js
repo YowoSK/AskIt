@@ -37,7 +37,8 @@ app.use(express.urlencoded({ extended: true }));
 app.get("/questions", requireAuth, (req, res) => {
   // Question.find().sort({ createdAt: -1 })
   Question.find()
-    .sort({ "NumberOfLikes.Likes": -1, createdAt: -1 })
+    // .sort({ "NumberOfLikes.Likes": -1, createdAt: 1 })
+    .sort({createdAt: -1 })
     .then((result) => {
       res.render("index", { questions: result, title: "All questions" });
     })
@@ -243,7 +244,7 @@ app.get("/signup",checkUser, requireAuth, isAdmin,(req, res) => {
 //teacher route
 app.get("/teacher",checkUser, requireAuth, isAdmin, (req, res) => {
   Question.find()
-    .sort({ "NumberOfLikes.Likes": -1, createdAt: -1 })
+    .sort({ "NumberOfLikes.Likes": -1, createdAt: 1 })
     .then((result) => {
       res.render("indexTeacher", { questions: result, title: "All questions" });
     })

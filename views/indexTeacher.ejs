@@ -34,6 +34,9 @@
 
 
                                 <a class="animated delete" data-doc="<%= question._id %>">Zmazať otázku</a>
+                                
+                                
+                            
 
 
                                 <!-- Michal liky/disliky -->
@@ -89,13 +92,20 @@
                     function autoRefresh() {
                         window.location = window.location.href;
                     }
-                    setInterval('autoRefresh()', 20000);
+                    setInterval('autoRefresh()', 60000);
 
 
                     //Mare: save scroll position 
                     window.addEventListener('beforeunload', function () {
                         localStorage.setItem('scrollPos', window.pageYOffset);
+                        if (interval) {
+                            localStorage.setItem("timerValue", seconds);
+                        }
+
                     });
+
+
+
 
 
                     //Marek:Skryje otazky po kliknuti tlacidla a ulozi do lokal storage stav 
@@ -151,49 +161,66 @@
 
 
 
-                    //Robo casovac//
-                    const time_el = document.querySelector('.timer .watch ')
-                    const start_btn = document.getElementById('btnStart');
-                    const stop_btn = document.getElementById('btnStop');
-                    const reset_btn = document.getElementById('btnReset');
+ //Robo casovac//
+ const time_el = document.querySelector(".timer .watch ");
+                    const start_btn = document.getElementById("btnStart");
+                    const stop_btn = document.getElementById("btnStop");
+                    const reset_btn = document.getElementById("btnReset");
                     let seconds = 0;
                     let interval = null;
 
-                    start_btn.addEventListener('click', btnStart)
-                    stop_btn.addEventListener('click', btnStop)
-                    reset_btn.addEventListener('click', btnReset)
+                    start_btn.addEventListener("click", btnStart);
+                    stop_btn.addEventListener("click", btnStop);
+                    reset_btn.addEventListener("click", btnReset);
 
-                    function watch() {
-                        seconds++;
+                    window.addEventListener("load", () => {
+                        const savedSeconds = localStorage.getItem("timerValue");
+                        if (savedSeconds !== null) {
+                            seconds = parseInt(savedSeconds);
+                            displayTime();
+                            if (interval === null) {
+                                interval = setInterval(watch, 1000);
+                            }
+                        }
+                    });
 
+                    function displayTime() {
                         let hrs = Math.floor(seconds / 3600);
-                        let mins = Math.floor((seconds - (hrs * 3600)) / 60);
+                        let mins = Math.floor((seconds - hrs * 3600) / 60);
                         let secs = seconds % 60;
 
-                        if (secs < 10) secs = '0' + secs
-                        if (mins < 10) mins = '0' + mins
-                        if (hrs < 10) hrs = '0' + hrs
+                        if (secs < 10) secs = "0" + secs;
+                        if (mins < 10) mins = "0" + mins;
+                        if (hrs < 10) hrs = "0" + hrs;
 
                         time_el.innerText = `${hrs}:${mins}:${secs}`;
                     }
 
+                    function watch() {
+                        seconds++;
+                        displayTime();
+                    }
+
                     function btnStart() {
                         if (interval) {
-                            return
+                            return;
                         }
-                        interval = setInterval(watch, 1000)
+                        interval = setInterval(watch, 1000);
                     }
+
                     function btnStop() {
                         clearInterval(interval);
                         interval = null;
                     }
+
                     function btnReset() {
                         stop();
                         seconds = 0;
-                        time_el.innerText = '00:00:00'
+                        displayTime();
+                        localStorage.removeItem("timerValue");
                     }
+
 
                 </script>
     </body>
-
 </html>

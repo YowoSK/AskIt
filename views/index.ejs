@@ -2,7 +2,7 @@
 <html lang="sk">
 
 <%- include ('./partials/header.ejs') -%>
-
+<script src="ara.js"></script>
     <body>
         <%- include ('./partials/nav.ejs') -%>
             <br>
@@ -17,7 +17,7 @@
                         otázku:</label>
                     <input class="input_text" type="text" id="input" name="input" required size="100">
                     <br>
-                    <button class="btn btn-features" type="submit"><span>Odoslať
+                    <button onclick="notifyMe()" class="btn btn-features" type="submit"><span>Odoslať
                             otázku</span></button>
                 </form>
                 <hr class="hr_main">
@@ -77,8 +77,7 @@
 
                             <!-- Michal liky/disliky -->
                             <div class="likecontainer" id="likecontainer">
-                                <button id="likebtn" onclick="like('<%= question._id %>')"
-                                    class="<%= question.NumberOfLikes.Likes >= 32 ? 'disable' : '' %>">
+                                <button id="likebtn" onclick="like('<%= question._id %>')">
                                     <i style="font-size: 25px;" class="fa fa-thumbs-up"></i>
                                     <!--<span id="numberoflikes"></span>-->
                                 </button>
@@ -87,8 +86,7 @@
                                     <%= question.NumberOfLikes.Likes %>
                                         <!-- <%= question.Likes %> -->
                                 </p>
-                                <button id="dislikebtn" onclick="dislike('<%= question._id %>')"
-                                    class="<%= question.NumberOfDislikes.Dislikes >= 32 ? 'disable' : '' %>">
+                                <button id="dislikebtn" onclick="dislike('<%= question._id %>')">
                                     <i style="font-size: 25px;" class="fa fa-thumbs-down"></i>
                                 </button>
                                 <!--<input type="number" id="countdislike" value="0">-->
@@ -119,7 +117,7 @@
                     function autoRefresh() {
                         window.location = window.location.href;
                     }
-                    setInterval('autoRefresh()', 20000);
+                    setInterval('autoRefresh()', 60000);
 
                     //ulozi text do local storage ktory je v text inpute
                     const inputField = document.querySelector('#input');
@@ -215,7 +213,21 @@
 
                     //Michalove like-y
                     function like(id, NumberOfLikes) {
-                        const endpoint = `questions/${id}/like/${NumberOfLikes}`;                        
+                        const endpoint = `questions/${id}/like/${NumberOfLikes}`;
+                        
+                        // Disable the dislike button for this question
+                        //const dislikeBtn = 
+                        //document.getElementById(`dislikebtn-${id}`).disabled = true;
+                        //dislikeBtn.disabled = true;    
+                           
+                        const likebtnStatus=localStorage.getItem(`liked-${id}`);
+                            //if (dislikebtnStatus === "clikcked"){
+                                //alert("You have disliked this question");
+                            //}else
+                            if (likebtnStatus === "clicked") {
+                            alert("You have already liked this question");
+                            
+                            }else{
 
                         fetch(endpoint, {
                             method: 'PUT',
@@ -224,11 +236,27 @@
                             .then(response => response.json())
                             .then(data => window.location.href = data.redirect)
                             .catch(err => console.log(err));
+
+                            localStorage.setItem(`liked-${id}`, "clicked");
                       }
+                    }
 
 
                     function dislike(id, NumberOfDislikes) {
                         const endpoint = `questions/${id}/dislike/${NumberOfDislikes}`;
+
+                        // Disable the like button for this question
+                        //const likeBtn = document.getElementById(`likebtn-${id}`);
+                        //likeBtn.disabled = true;
+                        
+                        const dislikebtnStatus=localStorage.getItem(`disliked-${id}`);
+                            //if (likebtnStatus === "clicked"){
+                                //alert("You have liked this question");
+                            //}else
+                            if (dislikebtnStatus === "clicked"){
+                                alert("You have already disliked this question");
+                            }else{
+
                         fetch(endpoint, {
                             method: 'PUT',
                             headers: { 'Content-Type': 'application/json' },
@@ -236,24 +264,45 @@
                             .then(response => response.json())
                             .then(data => window.location.href = data.redirect)
                             .catch(err => console.log(err));
+
+                            localStorage.setItem(`disliked-${id}`, "clicked");
+                    }
                     }
 
+
                     //Michal javascript
+                    /*
                     const likebtn = document.querySelector('#likebtn');
                     let dislikebtn = document.querySelector('#dislikebtn');
-                    let countlike = document.querySelector('#countlike');
-                    let countdislike = document.querySelector('#countdislike');
+                    //let countlike = document.querySelector('#countlike');
+                    //let countdislike = document.querySelector('#countdislike');
+                    
+                    const questionId=getQuestion();
+                    const userVote = localStorage.getItem(`question_${questionId}`);
 
-                    likebtn.addEventListener('click', (id) => {                        
-                        countlike.value = parseInt(countlike.value) + 1;
-                        countlike.style.color = "#12ff00";
-                         localStorage.setItem(`liked-${id}`, "like");
-                    });
+                    if (userVote === 'like') {
+                    // User has already clicked on the like button, disable the dislike button
+                    dislikebtn.disabled = true;
+                    } else if (userVote === 'dislike') {
+                    // User has already clicked on the dislike button, disable the like button
+                    likebtn.disabled = true;
+                    }
+
+                    likebtn.addEventListener('click', () => {                        
+                        // Store the user's vote in localStorage
+                        localStorage.setItem(`question_${questionId}`, 'like');
+                        // Disable the dislike button
+                        dislikebtn.disabled = true;
+                        });
+                        
 
                     dislikebtn.addEventListener('click', () => {
-                        countdislike.value = parseInt(countdislike.value) + 1;
-                        countdislike.style.color = "#ff0000";
-                    })
+                        // Store the user's vote in localStorage
+                        localStorage.setItem(`question_${questionId}`, 'dislike');
+                        // Disable the like button
+                        likebtn.disabled = true;
+                        });
+                    */
 
 
                     // Marek cenzura
@@ -289,6 +338,25 @@
                             console.log(error);
                         }
                     }
+
+                    // toto sa prida do tlacidla na pridanie otazky
+function notifyMe() {
+  // overi ci web podporuje notifikacie
+  if (!("Notification" in window)) {
+    alert("Tento prehľadávać nepodporuje desktop notifikácie");
+  } else if (Notification.permission === "granted") {
+    // ak podporuje tu sa vytvara notifikacia
+    var notification = new Notification("Na ASK.it bola pridana nová otázka!");
+  } else if (Notification.permission !== "denied") {
+    Notification.requestPermission().then(function (permission) {
+      if (permission === "granted") {
+        var notification = new Notification("Na ASK.it bola pridana nová otázka!");
+      }
+    });
+  }
+}
+
+
                 </script>
     </body>
 
